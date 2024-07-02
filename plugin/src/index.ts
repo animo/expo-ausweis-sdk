@@ -1,17 +1,10 @@
-import {
-	createRunOncePlugin,
-	type ConfigPlugin,
-	withPlugins,
-} from "@expo/config-plugins";
+import { type ConfigPlugin, createRunOncePlugin, withPlugins } from '@expo/config-plugins'
 
-import { withAndroidAusweisSdk } from "./withAndroidAusweisSdk";
-import { withIosAusweisSdk } from "./withIosAusweisSdk";
+import { withAndroidAusweisSdk } from './withAndroidAusweisSdk'
+import { withIosAusweisSdk } from './withIosAusweisSdk'
 
 const withAusweisSdk: ConfigPlugin = (config) => {
-	return withPlugins(config, [withAndroidAusweisSdk, withIosAusweisSdk]);
-};
+  return withPlugins(config, [withAndroidAusweisSdk, withIosAusweisSdk])
+}
 
-export default createRunOncePlugin(
-	withAusweisSdk,
-	"@animo-id/expo-ausweis-sdk",
-);
+export default createRunOncePlugin(withAusweisSdk, '@animo-id/expo-ausweis-sdk')

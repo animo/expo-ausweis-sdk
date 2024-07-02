@@ -1,6 +1,6 @@
-import { type ConfigPlugin, withAndroidManifest, withDangerousMod, withMainApplication } from '@expo/config-plugins'
-import path from 'node:path'
 import fs from 'node:fs'
+import path from 'node:path'
+import { type ConfigPlugin, withAndroidManifest, withDangerousMod, withMainApplication } from '@expo/config-plugins'
 import { addAndroidImports } from './util'
 
 /**

@@ -5,19 +5,15 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "build": "expo-module build",
-    "clean": "expo-module clean",
-    "prepublishOnly": "expo-module prepublishOnly",
+    "build": "EXPO_NONINTERACTIVE=1 expo-module build && EXPO_NONINTERACTIVE=1 expo-module build plugin",
+    "style:check": "biome check --unsafe",
+    "style:fix": "biome check --write --unsafe",
+    "types:check": "EXPO_NONINTERACTIVE=1 expo-module typecheck && EXPO_NONINTERACTIVE=1 expo-module plugin typecheck",
     "expo-module": "expo-module",
     "open:ios": "xed example/ios",
     "open:android": "open -a \"Android Studio\" example/android"
   },
-  "keywords": [
-    "react-native",
-    "expo",
-    "ausweis-sdk",
-    "AusweisSdk"
-  ],
+  "keywords": ["react-native", "expo", "ausweis-sdk", "AusweisSdk"],
   "repository": "https://github.com/animo/expo-ausweis-sdk",
   "bugs": {
     "url": "https://github.com/animo/expo-ausweis-sdk/issues"
@@ -26,10 +22,10 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/animo/expo-ausweis-sdk#readme",
   "dependencies": {
-    "@expo/config-plugins": "^8.0.6",
-    "resolve-from": "^5.0.0"
+    "@expo/config-plugins": "^8.0.6"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.8.1",
     "@types/node": "^20.14.9",
     "@types/react": "^18.0.25",
     "@types/resolve-from": "^5.0.1",

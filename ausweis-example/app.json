@@ -6,10 +6,7 @@
     "orientation": "portrait",
     "scheme": "ausweis-example",
     "userInterfaceStyle": "automatic",
-    "plugins": [
-      "expo-router",
-      "../app.plugin.js"
-    ],
+    "plugins": ["expo-router", "../app.plugin.js"],
     "experiments": {
       "typedRoutes": true
     },
