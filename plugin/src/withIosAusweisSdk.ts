@@ -8,7 +8,7 @@ import {
 	MergeResults,
 } from "@expo/config-plugins/build/utils/generateCode";
 
-const podSource = `pod 'AusweisApp2', :path => File.join(File.dirname(\`node --print "require.resolve('@animo-id/expo-ausweis-sdk/package.json')"\`), "ios/Specs/AusweisApp2/2.1.1")`;
+const podSource = `pod 'AusweisApp2', :path => File.join(File.dirname(\`node --print "require.resolve('@animo-id/expo-ausweis-sdk/package.json')"\`), "ios/Specs")`;
 
 export function addAusweisApp2Pod(src: string): MergeResults {
 	return mergeContents({
