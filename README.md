@@ -84,7 +84,7 @@ That's it, you now have Ausweis App SDK configured for your iOS and Android proj
 
 ## Usage
 
-You can now import `@animo-id/expo-ausweis-sdk` in your application and use the methods from SDK.
+You can now import `@animo-id/expo-ausweis-sdk` in your application and use the methods from the SDK.
 
 ```javascript
 import AusweisSdk from '@animo-id/expo-ausweis-sdk'
