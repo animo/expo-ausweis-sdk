@@ -24,4 +24,6 @@ Pod::Spec.new do |s|
   }
 
   s.source_files = "**/*.{h,m,swift}"
+
+  s.dependency 'AusweisApp2'
 end
