@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "ausweis-example",
+    "slug": "ausweis-example",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "ausweis-example",
+    "userInterfaceStyle": "automatic",
+    "plugins": [
+      "expo-router",
+      "../app.plugin.js"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "android": {
+      "package": "id.animo.ausweissdk.example"
+    },
+    "ios": {
+      "bundleIdentifier": "id.animo.ausweissdk.example"
+    }
+  }
+}
