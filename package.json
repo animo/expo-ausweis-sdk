@@ -4,6 +4,9 @@
   "description": "Expo Module Wrapper around the German eID Ausweis SDK",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "EXPO_NONINTERACTIVE=1 expo-module build && EXPO_NONINTERACTIVE=1 expo-module build plugin",
     "style:check": "biome check --unsafe",
