@@ -1,6 +1,6 @@
 {
   "name": "@animo-id/expo-ausweis-sdk",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Expo Module Wrapper around the German eID Ausweis SDK",
   "main": "build/index.js",
   "types": "build/index.d.ts",
