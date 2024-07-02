@@ -14,12 +14,7 @@
     "open:android": "open -a \"Android Studio\" example/android",
     "release": "release-it"
   },
-  "keywords": [
-    "react-native",
-    "expo",
-    "ausweis-sdk",
-    "AusweisSdk"
-  ],
+  "keywords": ["react-native", "expo", "ausweis-sdk", "AusweisSdk"],
   "repository": "https://github.com/animo/expo-ausweis-sdk",
   "bugs": {
     "url": "https://github.com/animo/expo-ausweis-sdk/issues"
