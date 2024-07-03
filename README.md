@@ -84,10 +84,42 @@ That's it, you now have Ausweis App SDK configured for your iOS and Android proj
 
 ## Usage
 
-You can now import `@animo-id/expo-ausweis-sdk` in your application and use the methods from the SDK.
+You can now import `@animo-id/expo-ausweis-sdk` in your application and use the methods from the SDK. 
 
 ```javascript
-import AusweisSdk from '@animo-id/expo-ausweis-sdk'
+import { useEffect, useState } from 'react'
+import { initializeSdk, sendCommand, addMessageListener } from '@animo-id/expo-ausweis-sdk'
+
+
+export function App() {
+  const [isSdkInitialized, setIsSdkInitialized] = useState(false)
+
+  // Setup listener
+  useEffect(
+    addMessageListener((message) => {
+      console.log('received message', JSON.stringify(message, null, 2))
+    }).remove,
+    []
+  )
+
+  // Initialize SDK
+  useEffect(() => {
+    initializeSdk()
+      .then(() => setIsSdkInitialized(true))
+      .catch((e) => {
+        console.log('error setting up', e)
+      })
+  }, [])
+
+  // Send command once SDK is initialized
+  useEffect(() => {
+    if (!isSdkInitialized) return
+
+    sendCommand({ cmd: 'GET_INFO' })
+  }, [isSdkInitialized])
+
+  return null
+}
 ```
 
 ## Contributing

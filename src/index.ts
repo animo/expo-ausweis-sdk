@@ -1,23 +1,19 @@
 import { EventEmitter, NativeModulesProxy, type Subscription } from 'expo-modules-core'
 
-import { ChangeEventPayload } from './AusweisSdk.types'
+import type { CommandPayload, MessageEventPayload, NativeMessageEventPayload } from './AusweisSdk.types'
 import AusweisSdkModule from './AusweisSdkModule'
 
-// Get the native constant value.
-export const PI = AusweisSdkModule.PI
-
-export function hello(): string {
-  return AusweisSdkModule.hello()
+export function sendCommand(command: CommandPayload): void {
+  AusweisSdkModule.sendCommand(JSON.stringify(command))
 }
 
-export async function setValueAsync(value: string) {
-  return await AusweisSdkModule.setValueAsync(value)
+export async function initializeSdk() {
+  return await AusweisSdkModule.initialize()
 }
 
 const emitter = new EventEmitter(AusweisSdkModule ?? NativeModulesProxy.AusweisSdk)
-
-export function addChangeListener(listener: (event: ChangeEventPayload) => void): Subscription {
-  return emitter.addListener<ChangeEventPayload>('onChange', listener)
+export function addMessageListener(listener: (message: MessageEventPayload) => void): Subscription {
+  return emitter.addListener<NativeMessageEventPayload>('onMessage', (event) => listener(JSON.parse(event.value)))
 }
 
-export { ChangeEventPayload }
+export type { MessageEventPayload, CommandPayload }

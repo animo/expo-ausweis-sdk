@@ -7,9 +7,6 @@
     "android": "expo run:android",
     "ios": "expo run:ios"
   },
-  "jest": {
-    "preset": "jest-expo"
-  },
   "dependencies": {
     "@animo-id/expo-ausweis-sdk": "../",
     "@react-navigation/native": "^6.0.2",
@@ -25,6 +22,11 @@
     "@babel/core": "^7.20.0",
     "@types/react": "~18.2.45",
     "typescript": "~5.3.3"
+  },
+  "expo": {
+    "autoLinking": {
+      "nativeModulesDir": ".."
+    }
   },
   "private": true
 }
