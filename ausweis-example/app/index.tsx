@@ -18,6 +18,7 @@ export default function App() {
     initializeSdk()
       .then(() => setIsSdkInitialized(true))
       .catch((e) => {
+        setIsSdkInitialized(true)
         console.log('error setting up', e)
       })
   }, [])

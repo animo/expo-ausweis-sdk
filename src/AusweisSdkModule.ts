@@ -4,7 +4,6 @@ import type { NativeModule } from 'react-native'
 interface AusweisSdk extends NativeModule {
   sendCommand: (command: string) => void
   initialize(): Promise<boolean>
-  asyncFunction: () => Promise<string>
 }
 
 // It loads the native module object from the JSI or falls back to

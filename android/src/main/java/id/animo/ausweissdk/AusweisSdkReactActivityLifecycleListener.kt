@@ -17,8 +17,7 @@ class AusweisSdkReactActivityLifecycleListener(private val context: Context) : R
     override fun onNewIntent(intent: Intent): Boolean {
         val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
         if (tag != null) {
-            val connectionHandler = AusweisSdkConnectionHandler.getInstance(context)
-            return connectionHandler.updateNfcTag(tag)
+            return AusweisSdkConnectionHandler.instance.updateNfcTag(tag)
         }
 
         return false
@@ -27,14 +26,12 @@ class AusweisSdkReactActivityLifecycleListener(private val context: Context) : R
     override fun onResume(activity: Activity) {
         super.onResume(activity)
 
-        val connectionHandler = AusweisSdkConnectionHandler.getInstance(context)
-        connectionHandler.enableDispatcher(activity)
+        AusweisSdkConnectionHandler.instance.enableDispatcher(activity)
     }
 
     override fun onPause(activity: Activity) {
         super.onPause(activity)
 
-        val connectionHandler = AusweisSdkConnectionHandler.getInstance(context)
-        connectionHandler.disableDispatcher(activity)
+        AusweisSdkConnectionHandler.instance.disableDispatcher(activity)
     }
 }

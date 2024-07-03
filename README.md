@@ -45,7 +45,7 @@ An [Expo Module](https://docs.expo.dev/modules/overview/) and [Expo Config Plugi
 
 ## Getting Started
 
-Install the plugin and `expo-build-properties` using the following command. We need `expo-build-properties` to set the `minSdkVersion` for Android to at least 26. If you're already on 26 or higher this package is not needed.
+Install the plugin and `expo-build-properties` using the following command. We need `expo-build-properties` to set the `minSdkVersion` for Android to at least 26, and enable `useLegacyPackaging` (see [App Bundle](https://www.ausweisapp.bund.de/sdk/android.html#app-bundle) in Ausweis SDK documentation).
 
 ```sh
 # yarn
@@ -69,7 +69,8 @@ Then add the plugin to your Expo app config (`app.json`, `app.config.json` or `a
         "expo-build-properties",
         {
           "android": {
-            "minSdkVersion": 26
+            "minSdkVersion": 26,
+            "useLegacyPackaging": true
           }
         }
       ]
