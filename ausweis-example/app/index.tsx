@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native'
-import { initializeSdk, sendCommand, addMessageListener } from '@animo-id/expo-ausweis-sdk'
+import { addMessageListener, initializeSdk, sendCommand } from '@animo-id/expo-ausweis-sdk'
 import { useEffect, useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 
 export default function App() {
   const [isSdkInitialized, setIsSdkInitialized] = useState(false)

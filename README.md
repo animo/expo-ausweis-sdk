@@ -45,17 +45,17 @@ An [Expo Module](https://docs.expo.dev/modules/overview/) and [Expo Config Plugi
 
 ## Getting Started
 
-Install the plugin using the following command:
+Install the plugin and `expo-build-properties` using the following command. We need `expo-build-properties` to set the `minSdkVersion` for Android to at least 26. If you're already on 26 or higher this package is not needed.
 
 ```sh
 # yarn
-yarn add @animo-id/expo-ausweis-sdk
+yarn add @animo-id/expo-ausweis-sdk expo-build-properties
 
 # npm
-npm install @animo-id/expo-ausweis-sdk
+npm install @animo-id/expo-ausweis-sdk expo-build-properties
 
 # npm
-pnpm install @animo-id/expo-ausweis-sdk
+pnpm install @animo-id/expo-ausweis-sdk expo-build-properties
 ```
 
 Then add the plugin to your Expo app config (`app.json`, `app.config.json` or `app.config.js`) `plugins` array:
@@ -63,7 +63,17 @@ Then add the plugin to your Expo app config (`app.json`, `app.config.json` or `a
 ```json
 {
   "expo": {
-    "plugins": ["@animo-id/expo-ausweis-sdk"]
+    "plugins": [
+      "@animo-id/expo-ausweis-sdk",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26
+          }
+        }
+      ]
+    ]
   }
 }
 ```
