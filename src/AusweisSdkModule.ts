@@ -6,6 +6,10 @@ interface AusweisSdk extends NativeModule {
   initialize(): Promise<boolean>
 }
 
+export type NativeMessageEventPayload = {
+  value: string
+}
+
 // It loads the native module object from the JSI or falls back to
 // the bridge module (from NativeModulesProxy) if the remote debugger is on.
 export default requireNativeModule<AusweisSdk>('AusweisSdk')

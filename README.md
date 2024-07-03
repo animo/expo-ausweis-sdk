@@ -97,7 +97,7 @@ That's it, you now have Ausweis App SDK configured for your iOS and Android proj
 
 You can now import `@animo-id/expo-ausweis-sdk` in your application and use the methods from the SDK. 
 
-```javascript
+```tsx
 import { useEffect, useState } from 'react'
 import { initializeSdk, sendCommand, addMessageListener } from '@animo-id/expo-ausweis-sdk'
 
