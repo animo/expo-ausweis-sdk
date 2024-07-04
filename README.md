@@ -27,7 +27,7 @@
     href="https://raw.githubusercontent.com/animo/expo-ausweis-sdk/main/LICENSE"
     ><img
       alt="License"
-      src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"
+      src="https://img.shields.io/badge/License-EUPL%201.2-blue.svg"
   /></a>
 </p>
 
@@ -141,4 +141,4 @@ Is there something you'd like to fix or add? Great, we love community contributi
 
 ## License
 
-Expo Ausweis SDK is licensed under the [Apache License Version 2.0 (Apache-2.0)](./LICENSE).
+Expo Ausweis SDK is licensed under the [EUPL Version 1.2](./LICENSE). The AusweisApp SDK used by this Expo Module is also licensed under EUPL Version 1.2

@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version      = "2.1.1"
   s.summary      = "AusweisApp2 SDK"
   s.homepage     = "https://www.ausweisapp.bund.de/sdk/ios.html"
-  s.license      = 'Apache License, Version 2.0'
+  s.license      = 'EUPL, Version 1.2'
   s.author       = { "Governikus" => "Governikus" }
 
   s.platform     = :ios, "13.0"
