@@ -123,6 +123,8 @@ class AusweisSdkConnectionHandler() {
     }
 
     fun enableDispatcher(activity: Activity) {
+        // Flags needed as defined in
+        // https://www.ausweisapp.bund.de/sdk/android.html#dispatching-nfc-tags-in-foreground
         val flags =
             NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_NFC_B or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
 
