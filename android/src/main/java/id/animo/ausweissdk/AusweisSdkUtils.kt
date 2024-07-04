@@ -14,10 +14,10 @@ class AusweisSdkUtils {
                 return Application.getProcessName().endsWith(AA2_PROCESS)
             }
 
-            val pid = android.os.Process.myPid()
+            val processId = android.os.Process.myPid()
             val manager = application.getSystemService(Application.ACTIVITY_SERVICE) as ActivityManager
             for (appProcess in manager.runningAppProcesses) {
-                if (appProcess.pid == pid) {
+                if (appProcess.pid == processId) {
                     return appProcess.processName.endsWith(AA2_PROCESS)
                 }
             }
