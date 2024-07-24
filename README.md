@@ -103,7 +103,6 @@ You can see the available [commands](https://www.ausweisapp.bund.de/sdk/commands
 import { useEffect, useState } from 'react'
 import { initializeSdk, sendCommand, addMessageListener } from '@animo-id/expo-ausweis-sdk'
 
-
 export function App() {
   const [isSdkInitialized, setIsSdkInitialized] = useState(false)
 
@@ -132,6 +131,70 @@ export function App() {
   }, [isSdkInitialized])
 
   return null
+}
+```
+
+### Auth Flow
+
+The package also exports an `AusweisAuthFlow` class that wraps the required logic for a general auth flow. An example of how to use the class can be found below.
+
+To use the `AusweisAuthFlow` you need to configure it with the correct callbacks, and then call the `start()` method with the `tcTokenUrl`.
+
+To cancel the flow, you can call the `cancel()` flow on the `AusweisAuthFlow` instance.
+
+The Ausweis SDK only allows one flow to be active concurrently. It is important that you do not create multiple instances of the `AusweisAuthFlow`, as they will both receive the same events and messages, and will cause conflicts.
+
+Note that this class is optimized for a simple auth flow and thus it may not fit all use cases. For example, the `SET_CAN` and `SET_PUK` commands are not supported (in case of too many failed PIN attempts). Attached simulator cards are also not supported. For more advanced use cases you can use the lower level commands and message listeners methods.
+
+```tsx
+import { AusweisAuthFlow } from '@animo-id/expo-ausweis-sdk'
+import { useState } from 'react'
+import { Button } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+
+export default function App() {
+  const [message, setMessage] = useState<string>()
+  const [flow, setFlow] = useState<AusweisAuthFlow>()
+
+  const cancelFlow = () =>
+    flow
+      ?.cancel()
+      .then(() => setFlow(undefined))
+      .catch((error) => setMessage(`Error canceling flow. ${error.message}`))
+
+  const runAuthFlow = async () => {
+    setMessage(undefined)
+    setFlow(
+      new AusweisAuthFlow({
+        onEnterPin: ({ attemptsRemaining }) => {
+          // Mock incorrect pin entry
+          return attemptsRemaining === 1 ? '123456' : '123123'
+        },
+        onError: ({ message, reason }) => {
+          setFlow(undefined)
+          setMessage(`${reason}: ${message}`)
+        },
+        onSuccess: () => {
+          setFlow(undefined)
+          setMessage('Successfully ran auth flow')
+        },
+        onInsertCard: () => {
+          // For iOS this will show the NFC scanner modal. on Android we need
+          // use this callback to show the NFC scanner modal.
+          console.log('please insert card')
+        },
+      }).start({
+        tcTokenUrl: 'https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet',
+      })
+    )
+  }
+
+  return (
+    <View style={[StyleSheet.absoluteFill, { flex: 1, alignContent: 'center', justifyContent: 'center' }]}>
+      <Button onPress={flow ? cancelFlow : runAuthFlow} title={flow ? 'Cancel' : 'Start Auth Flow'} />
+      {message && <Text>{message}</Text>}
+    </View>
+  )
 }
 ```
 
