@@ -13,6 +13,6 @@ __tests__
 /android/build/
 /ausweis-example/
 
-src
-plugin/src
+/src
+/plugin/src
 tsconfig.json
