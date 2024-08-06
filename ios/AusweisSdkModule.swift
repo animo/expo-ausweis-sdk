@@ -66,7 +66,7 @@ public class AusweisSdkModule: Module {
         ausweisapp2_send(command)
     }
 
-    AsyncFunction("initialize") {
+    AsyncFunction("initialize") { () -> Bool in
         if isSdkInitialized {
             return true
         }
