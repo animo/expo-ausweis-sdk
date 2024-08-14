@@ -36,8 +36,14 @@ public class AusweisSdkModule: Module {
     // Async function to initialize the SDK and wait for it to be ready
     func initializeSdk() async -> Bool {
         return await withCheckedContinuation { continuation in
+            // If the SDK is already running it means the app was reloaded, but not the ausweis SDK
+            // We shutdown and re-initialize (this should only happen in development)
+            let isRunning = ausweisapp2_is_running()
+            if isRunning {
+                ausweisapp2_shutdown()
+            }
+
             let initialized = ausweisapp2_init(ausweisSdkCallback, nil)
-            
             if initialized {
                 DispatchQueue.global().async {
                     _ = initializationSemaphore.wait(timeout: .now() + 10) // Wait for up to 10 seconds
@@ -60,7 +66,7 @@ public class AusweisSdkModule: Module {
     // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
     Function("sendCommand") { (command: String) in
         if (!isSdkInitialized) {
-            throw NSError(domain: "AusweisSdkError", code: 1, userInfo: [NSLocalizedDescriptionKey: "SDK Is not initalized. Make sure to call initialize first."])
+            throw NSError(domain: "AusweisSdkError", code: 1, userInfo: [NSLocalizedDescriptionKey: "SDK Is not initialized. Make sure to call initialize first."])
         }
         
         ausweisapp2_send(command)
