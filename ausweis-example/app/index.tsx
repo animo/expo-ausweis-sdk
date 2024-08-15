@@ -10,6 +10,9 @@ export default function App() {
   const [isCardAttached, setIsCardAttached] = useState(false)
   const [progress, setProgress] = useState(0)
 
+  const [requestedAccessRights, setRequestedAccessRights] = useState<string[]>()
+  const [onAcceptAccessRights, setOnAcceptAccessRights] = useState<(accept: boolean) => void>()
+
   const cancelFlow = () =>
     flow
       ?.cancel()
@@ -44,6 +47,17 @@ export default function App() {
         },
         onCardAttachedChanged: ({ isCardAttached }) => setIsCardAttached(isCardAttached),
         onStatusProgress: ({ progress }) => setProgress(progress),
+        onRequestAccessRights: ({ effective }) =>
+          new Promise((resolve) => {
+            setRequestedAccessRights(effective)
+            setOnAcceptAccessRights(() => {
+              return (accept: boolean) => {
+                resolve({ acceptAccessRights: accept })
+                setOnAcceptAccessRights(undefined)
+                setRequestedAccessRights(undefined)
+              }
+            })
+          }),
       }).start({
         tcTokenUrl: 'https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet',
       })
@@ -56,6 +70,16 @@ export default function App() {
       {flow && <Text>Progress: {progress}%</Text>}
       {flow && <Text>Is card attached: {isCardAttached ? 'Yes' : 'No'}</Text>}
       {flow && cardAttachRequested && <Text>Please present your card to the NFC scanner</Text>}
+      {flow && requestedAccessRights && (
+        <>
+          <Text>
+            Requested Access Rights:
+            {'\n -'}
+            {requestedAccessRights.join('\n- ')}
+          </Text>
+          <Button title="Accept" onPress={() => onAcceptAccessRights?.(true)} />
+        </>
+      )}
       {message && <Text>{message}</Text>}
     </View>
   )
