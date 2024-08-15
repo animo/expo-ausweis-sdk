@@ -1,4 +1,5 @@
 import {
+  type AusweisSdkAccessRightsMessage,
   type AusweisSdkAuthMessage,
   type AusweisSdkCommand,
   type AusweisSdkEnterPinMessage,
@@ -33,9 +34,60 @@ export interface AusweisAuthFlowOptions {
   onEnterPin: (options: OnEnterPinOptions) => Promise<string> | string
 
   /**
-   * Callback to notify that the card should be inserted/placed on the NFC scanner.
+   * callback that will be called when a card is attached/detached from the NFC scanner.
    */
-  onInsertCard?: () => void
+  onCardAttachedChanged?: (options: { isCardAttached: boolean }) => void
+
+  /**
+   * callback that will be called with status updates on the auth flow progress.
+   */
+  onStatusProgress?: (options: {
+    /**
+     * number between 0 and 100 indicating the progress of the auth flow
+     */
+    progress: number
+  }) => void
+
+  /**
+   * Callback to notify that the card should be attached/placed on the NFC scanner.
+   */
+  onAttachCard?: () => void
+
+  /**
+   * Callback that will be called when the sdk asks for confirmation of access rights.
+   * If this callback is not provided, the access rights will be automatically accepted.
+   *
+   * It will wait for the promise to be resolved, and has no configured timeout.
+   * If you need to cancel the flow, you should throw/reject the promise or return false for
+   * for `acceptAccessRights`.
+   */
+  onRequestAccessRights?: (options: {
+    /**
+     * Current configured access rights to grant, will be used as the access rights if `true` is returned
+     * for `acceptAccessRights`.
+     */
+    effective: string[]
+
+    /**
+     * The required access rights. If `acceptAccessRights` is an array and does not contain all access
+     * rights from the `required` array, the flow will be cancelled as it's not possible to continue.
+     */
+    required: string[]
+
+    /**
+     * Optional access rights. You can include this in the `acceptAccessRights` array, but it is not required.
+     */
+    optional: string[]
+  }) => Promise<{
+    /**
+     * Whether to accept the access rights.
+     *  - `true` - Accept based on passed `effective` access rights
+     *  - `false` - Do not accept (will cancel the auth flow)
+     *  - `string[]` - Accept the access rights from the array. Flow will fail if not all
+     *      `required` access rights are provided.
+     */
+    acceptAccessRights: true | false | string[]
+  }>
 
   /**
    * Callback that will be called when the authentication flow succeeded.
@@ -51,6 +103,11 @@ export interface AusweisAuthFlowOptions {
    *  - An action is needed that is not supported by this flow, such as ENTER_CAN or ENTER_PUK
    */
   onError: (details: OnErrorDetails) => void
+
+  /**
+   * will enable logging of commands and messages sent/received
+   */
+  debug?: boolean
 }
 
 export interface AusweisAuthFlowStartOptions {
@@ -165,13 +222,29 @@ export class AusweisAuthFlow {
 
   // NOTE: arrow function to have correct binding of this.
   private onMessage = (message: AusweisSdkMessage) => {
-    // TODO: should probably let the user handle access rights?
+    this.debug('Received message from ausweis sdk', JSON.stringify(message, null, 2))
+
     if (message.msg === 'ACCESS_RIGHTS') {
-      this.acceptAccessRights()
+      this.handleAccessRights(message)
+    }
+
+    if (message.msg === 'READER') {
+      // If card is empty object the card is unknown, we see that as no card attached for this flow
+      const isCardAttached = message.card !== null && Object.keys(message.card).length > 0
+
+      this.options.onCardAttachedChanged?.({
+        isCardAttached,
+      })
+    }
+
+    if (message.msg === 'STATUS' && message.workflow === 'AUTH' && typeof message.progress === 'number') {
+      this.options.onStatusProgress?.({
+        progress: message.progress,
+      })
     }
 
     if (message.msg === 'INSERT_CARD') {
-      this.options.onInsertCard?.()
+      this.options.onAttachCard?.()
     }
 
     if (message.msg === 'ENTER_PIN') {
@@ -186,6 +259,46 @@ export class AusweisAuthFlow {
       this.handleError({
         reason: 'card_locked',
         message: `The card is locked and first needs to be unlocked using the '${message.msg.replace('ENTER_', '')}'. This is not supported by the AusweisAuthFlow. Unblock the card first, before using the AusweisAuthFlow again. This is probably due to too many failed PIN attempts`,
+      })
+    }
+  }
+
+  private async handleAccessRights(message: AusweisSdkAccessRightsMessage) {
+    try {
+      const { acceptAccessRights } = (await this.options.onRequestAccessRights?.({
+        effective: message.chat.effective,
+        optional: message.chat.optional,
+        required: message.chat.required,
+      })) ?? { acceptAccessRights: true }
+
+      if (!acceptAccessRights) {
+        return this.handleError({
+          reason: 'user_cancelled',
+          message: 'Access rights were declined',
+        })
+      }
+
+      if (Array.isArray(acceptAccessRights)) {
+        if (!message.chat.required.every((requiredRight) => acceptAccessRights.includes(requiredRight))) {
+          return this.handleError({
+            reason: 'user_cancelled',
+            message: `Not all access rights were accepted. Required are ${message.chat.required.join(', ')}, accepted are ${acceptAccessRights.join(', ')}`,
+          })
+        }
+
+        this.sendCommand({
+          cmd: 'SET_ACCESS_RIGHTS',
+          chat: acceptAccessRights,
+        })
+      }
+      this.sendCommand({
+        cmd: 'ACCEPT',
+      })
+    } catch (error) {
+      this.handleError({
+        message: 'Error in onRequestAccessRights callback',
+        reason: 'unknown',
+        error,
       })
     }
   }
@@ -234,13 +347,8 @@ export class AusweisAuthFlow {
     })
   }
 
-  private async acceptAccessRights() {
-    this.sendCommand({
-      cmd: 'ACCEPT',
-    })
-  }
-
   private sendCommand(command: AusweisSdkCommand) {
+    this.debug('Sending command to ausweis sdk', JSON.stringify(command, null, 2))
     sendCommand(command)
     this.sentCommands.push(command)
   }
@@ -266,5 +374,10 @@ export class AusweisAuthFlow {
     if (!this.isInProgress) {
       throw new Error('Auth flow not in progress')
     }
+  }
+
+  private debug(...args: unknown[]) {
+    if (!this.options.debug) return
+    console.log(...args)
   }
 }
