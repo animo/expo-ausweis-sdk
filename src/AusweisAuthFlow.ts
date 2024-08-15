@@ -33,9 +33,24 @@ export interface AusweisAuthFlowOptions {
   onEnterPin: (options: OnEnterPinOptions) => Promise<string> | string
 
   /**
-   * Callback to notify that the card should be inserted/placed on the NFC scanner.
+   * callback that will be called when a card is attached/detached from the NFC scanner.
    */
-  onInsertCard?: () => void
+  onCardAttachedChanged?: (options: { isCardAttached: boolean }) => void
+
+  /**
+   * callback that will be called with status updates on the auth flow progress.
+   */
+  onStatusProgress?: (options: {
+    /**
+     * number between 0 and 100 indicating the progress of the auth flow
+     */
+    progress: number
+  }) => void
+
+  /**
+   * Callback to notify that the card should be attached/placed on the NFC scanner.
+   */
+  onAttachCard?: () => void
 
   /**
    * Callback that will be called when the authentication flow succeeded.
@@ -51,6 +66,11 @@ export interface AusweisAuthFlowOptions {
    *  - An action is needed that is not supported by this flow, such as ENTER_CAN or ENTER_PUK
    */
   onError: (details: OnErrorDetails) => void
+
+  /**
+   * will enable logging of commands and messages sent/received
+   */
+  debug?: boolean
 }
 
 export interface AusweisAuthFlowStartOptions {
@@ -165,13 +185,30 @@ export class AusweisAuthFlow {
 
   // NOTE: arrow function to have correct binding of this.
   private onMessage = (message: AusweisSdkMessage) => {
+    this.debug('Received message from ausweis sdk', JSON.stringify(message, null, 2))
+
     // TODO: should probably let the user handle access rights?
     if (message.msg === 'ACCESS_RIGHTS') {
       this.acceptAccessRights()
     }
 
+    if (message.msg === 'READER') {
+      // If card is empty object the card is unknown, we see that as no card attached for this flow
+      const isCardAttached = message.card !== null && Object.keys(message.card).length > 0
+
+      this.options.onCardAttachedChanged?.({
+        isCardAttached,
+      })
+    }
+
+    if (message.msg === 'STATUS' && message.workflow === 'AUTH' && typeof message.progress === 'number') {
+      this.options.onStatusProgress?.({
+        progress: message.progress,
+      })
+    }
+
     if (message.msg === 'INSERT_CARD') {
-      this.options.onInsertCard?.()
+      this.options.onAttachCard?.()
     }
 
     if (message.msg === 'ENTER_PIN') {
@@ -241,6 +278,7 @@ export class AusweisAuthFlow {
   }
 
   private sendCommand(command: AusweisSdkCommand) {
+    this.debug('Sending command to ausweis sdk', JSON.stringify(command, null, 2))
     sendCommand(command)
     this.sentCommands.push(command)
   }
@@ -266,5 +304,10 @@ export class AusweisAuthFlow {
     if (!this.isInProgress) {
       throw new Error('Auth flow not in progress')
     }
+  }
+
+  private debug(...args: unknown[]) {
+    if (!this.options.debug) return
+    console.log(...args)
   }
 }

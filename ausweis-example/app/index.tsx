@@ -1,11 +1,14 @@
 import { AusweisAuthFlow } from '@animo-id/expo-ausweis-sdk'
 import { useState } from 'react'
-import { Button } from 'react-native'
-import { StyleSheet, Text, View } from 'react-native'
+import { Button, StyleSheet, Text, View } from 'react-native'
 
 export default function App() {
   const [message, setMessage] = useState<string>()
   const [flow, setFlow] = useState<AusweisAuthFlow>()
+
+  const [cardAttachRequested, setCardAttachRequested] = useState(false)
+  const [isCardAttached, setIsCardAttached] = useState(false)
+  const [progress, setProgress] = useState(0)
 
   const cancelFlow = () =>
     flow
@@ -17,23 +20,30 @@ export default function App() {
     setMessage(undefined)
     setFlow(
       new AusweisAuthFlow({
+        debug: true,
         onEnterPin: ({ attemptsRemaining }) => {
           // Mock incorrect pin entry
           return attemptsRemaining === 1 ? '123456' : '123123'
         },
         onError: ({ message, reason }) => {
           setFlow(undefined)
+          setCardAttachRequested(false)
+          setProgress(0)
           setMessage(`${reason}: ${message}`)
         },
         onSuccess: () => {
           setFlow(undefined)
+          setProgress(100)
+          setCardAttachRequested(false)
           setMessage('Successfully ran auth flow')
         },
-        onInsertCard: () => {
-          // For iOS this will show the NFC scanner modal. on Android we need
+        onAttachCard: () => {
+          // iOS will already show the NFC scanner modal, but on Android we need
           // use this callback to show the NFC scanner modal.
-          console.log('please insert card')
+          setCardAttachRequested(true)
         },
+        onCardAttachedChanged: ({ isCardAttached }) => setIsCardAttached(isCardAttached),
+        onStatusProgress: ({ progress }) => setProgress(progress),
       }).start({
         tcTokenUrl: 'https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet',
       })
@@ -43,6 +53,9 @@ export default function App() {
   return (
     <View style={[StyleSheet.absoluteFill, { flex: 1, alignContent: 'center', justifyContent: 'center' }]}>
       <Button onPress={flow ? cancelFlow : runAuthFlow} title={flow ? 'Cancel' : 'Start Auth Flow'} />
+      {flow && <Text>Progress: {progress}%</Text>}
+      {flow && <Text>Is card attached: {isCardAttached ? 'Yes' : 'No'}</Text>}
+      {flow && cardAttachRequested && <Text>Please present your card to the NFC scanner</Text>}
       {message && <Text>{message}</Text>}
     </View>
   )
