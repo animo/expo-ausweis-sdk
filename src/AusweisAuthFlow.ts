@@ -230,7 +230,7 @@ export class AusweisAuthFlow {
 
     if (message.msg === 'READER') {
       // If card is empty object the card is unknown, we see that as no card attached for this flow
-      const isCardAttached = message.card !== null && Object.keys(message.card).length > 0
+      const isCardAttached = message.card !== null && message.card !== undefined && Object.keys(message.card).length > 0
 
       this.options.onCardAttachedChanged?.({
         isCardAttached,
