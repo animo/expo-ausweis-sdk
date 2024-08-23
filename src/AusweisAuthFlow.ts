@@ -5,6 +5,7 @@ import {
   type AusweisSdkEnterPinMessage,
   type AusweisSdkMessage,
   type Subscription,
+  type AusweisSdkRunAuthCommand,
   addMessageListener,
   initializeSdk,
   sendCommand,
@@ -108,6 +109,8 @@ export interface AusweisAuthFlowOptions {
    * will enable logging of commands and messages sent/received
    */
   debug?: boolean
+
+  iosNfcModalMessages?: AusweisSdkRunAuthCommand['messages']
 }
 
 export interface AusweisAuthFlowStartOptions {
@@ -338,10 +341,11 @@ export class AusweisAuthFlow {
       developerMode: true,
       // TODO:
       messages: {
-        sessionStarted: "Please place your ID card on the top of the device's back side.",
-        sessionFailed: 'Scanning process failed.',
-        sessionSucceeded: 'Scanning process has been finished successfully.',
-        sessionInProgress: 'Scanning process is in progress.',
+        sessionStarted: 'Place your device on top of your eID card to scan it',
+        sessionFailed: 'Scan failed',
+        sessionSucceeded: 'Scan successful',
+        sessionInProgress: 'Scanning in progress',
+        ...this.options.iosNfcModalMessages,
       },
       tcTokenURL: startOptions.tcTokenUrl,
     })
