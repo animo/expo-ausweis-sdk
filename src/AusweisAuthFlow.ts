@@ -211,15 +211,21 @@ export class AusweisAuthFlow {
       message.result.major === 'http://www.bsi.bund.de/ecard/api/1.1/resultmajor#error' &&
       message.result.minor === 'http://www.bsi.bund.de/ecard/api/1.1/resultminor/sal#cancellationByUser'
     ) {
-      this.handleError({
-        reason: 'user_cancelled',
-        message: message.result.message ?? 'User cancelled',
-      }, false)
+      this.handleError(
+        {
+          reason: 'user_cancelled',
+          message: message.result.message ?? 'User cancelled',
+        },
+        false
+      )
     } else {
-      this.handleError({
-        reason: 'unknown',
-        message: `Unknown error occurred in auth flow. ${message.result.message}`,
-      }, false)
+      this.handleError(
+        {
+          reason: 'unknown',
+          message: `Unknown error occurred in auth flow. ${message.result.message}`,
+        },
+        false
+      )
     }
   }
 
