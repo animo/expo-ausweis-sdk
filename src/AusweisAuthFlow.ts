@@ -182,9 +182,9 @@ export class AusweisAuthFlow {
     this.isSdkInitialized = true
   }
 
-  private async handleError(details: OnErrorDetails) {
+  private async handleError(details: OnErrorDetails, cancel = true) {
     if (this.isInProgress) {
-      this.sendCommand({ cmd: 'CANCEL' })
+      if (cancel) this.sendCommand({ cmd: 'CANCEL' })
       this.reset()
       this.options.onError(details)
     }
@@ -214,12 +214,12 @@ export class AusweisAuthFlow {
       this.handleError({
         reason: 'user_cancelled',
         message: message.result.message ?? 'User cancelled',
-      })
+      }, false)
     } else {
       this.handleError({
         reason: 'unknown',
         message: `Unknown error occurred in auth flow. ${message.result.message}`,
-      })
+      }, false)
     }
   }
 
