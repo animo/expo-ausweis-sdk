@@ -246,16 +246,15 @@ export class AusweisAuthFlow {
     if (message.msg === 'READER') {
       // If card is empty object the card is unknown, we see that as no card attached for this flow
       const isSimulator = message.name === 'Simulator'
+
+      // Return early if simulator not allowed. As we don't want to emit events related to that
+      if (isSimulator && !this.options.allowSimulatorCard) return
+
       const isCardAttached =
         message.attached &&
         (isSimulator || (message.card !== null && message.card !== undefined && Object.keys(message.card).length > 0))
 
       if (isSimulator) this.isSimulatorCardAttached = isCardAttached
-      console.log({
-        isCardAttached,
-        isSimulator,
-        isSimulatorCardAttached: this.isSimulatorCardAttached,
-      })
 
       this.options.onCardAttachedChanged?.({
         isCardAttached,
@@ -270,11 +269,12 @@ export class AusweisAuthFlow {
     }
 
     if (message.msg === 'INSERT_CARD') {
-      if (this.options.allowSimulatorCard && this.isSimulatorCardAttached) {
+      if (this.options.allowSimulatorCard) {
         this.sendCommand({
           cmd: 'SET_CARD',
           name: 'Simulator',
         })
+        this.isSimulatorCardAttached = true
         return
       }
       this.options.onAttachCard?.()
