@@ -171,10 +171,12 @@ export interface AusweisSdkInterruptCommand extends BaseAusweisSdkCommandPayload
 
 /**
  * SET_PIN command payload to set the PIN of inserted card.
+ *
+ * `value` can be omitted in case of simulator card.
  */
 export interface AusweisSdkSetPinCommand extends BaseAusweisSdkCommandPayload {
   cmd: 'SET_PIN'
-  value: string
+  value?: string
 }
 
 /**

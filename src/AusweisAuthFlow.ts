@@ -37,7 +37,7 @@ export interface AusweisAuthFlowOptions {
   /**
    * callback that will be called when a card is attached/detached from the NFC scanner.
    */
-  onCardAttachedChanged?: (options: { isCardAttached: boolean }) => void
+  onCardAttachedChanged?: (options: { isCardAttached: boolean; isSimulator: boolean }) => void
 
   /**
    * callback that will be called with status updates on the auth flow progress.
@@ -110,6 +110,11 @@ export interface AusweisAuthFlowOptions {
    */
   debug?: boolean
 
+  /**
+   * Will enable the use of a simulator card if available. Note that this can only be used in test environments
+   */
+  allowSimulatorCard?: boolean
+
   iosNfcModalMessages?: AusweisSdkRunAuthCommand['messages']
 }
 
@@ -125,6 +130,7 @@ export class AusweisAuthFlow {
   private messageListener?: Subscription
   private sentCommands: Array<AusweisSdkCommand> = []
   private isSdkInitialized = false
+  private isSimulatorCardAttached = false
 
   public constructor(private options: AusweisAuthFlowOptions) {}
 
@@ -239,10 +245,21 @@ export class AusweisAuthFlow {
 
     if (message.msg === 'READER') {
       // If card is empty object the card is unknown, we see that as no card attached for this flow
-      const isCardAttached = message.card !== null && message.card !== undefined && Object.keys(message.card).length > 0
+      const isSimulator = message.name === 'Simulator'
+      const isCardAttached =
+        message.attached &&
+        (isSimulator || (message.card !== null && message.card !== undefined && Object.keys(message.card).length > 0))
+
+      if (isSimulator) this.isSimulatorCardAttached = isCardAttached
+      console.log({
+        isCardAttached,
+        isSimulator,
+        isSimulatorCardAttached: this.isSimulatorCardAttached,
+      })
 
       this.options.onCardAttachedChanged?.({
         isCardAttached,
+        isSimulator,
       })
     }
 
@@ -253,6 +270,13 @@ export class AusweisAuthFlow {
     }
 
     if (message.msg === 'INSERT_CARD') {
+      if (this.options.allowSimulatorCard && this.isSimulatorCardAttached) {
+        this.sendCommand({
+          cmd: 'SET_CARD',
+          name: 'Simulator',
+        })
+        return
+      }
       this.options.onAttachCard?.()
     }
 
@@ -316,6 +340,13 @@ export class AusweisAuthFlow {
     const retryCounter = message.reader.card?.retryCounter ?? 3
 
     try {
+      if (this.options.allowSimulatorCard && this.isSimulatorCardAttached) {
+        this.sendCommand({
+          cmd: 'SET_PIN',
+        })
+        return
+      }
+
       // The attempts remaining is weird. The retryCounter when 1 will require the CAN. If it's 0 it requires
       // the PUK. We don't support setting CAN / PUK in this flow so we substract 1 from the retry counter.
       // There is the case however if the user unlocked the card using CAN in e.g. the Ausweis App (not SDK)

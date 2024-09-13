@@ -25,5 +25,5 @@ Pod::Spec.new do |s|
 
   s.source_files = "**/*.{h,m,swift}"
 
-  s.dependency 'AusweisApp2'
+  s.dependency 'AusweisApp2', '2.2.1'
 end

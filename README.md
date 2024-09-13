@@ -173,6 +173,8 @@ export default function App() {
     setFlow(
       new AusweisAuthFlow({
         debug: true,
+        // Can set to true to allow simulator cards. In this case `onEnterPin` and `onAttachCard` won't be called
+        allowSimulatorCard: false,
         onEnterPin: ({ attemptsRemaining }) => {
           // Mock incorrect pin entry
           return attemptsRemaining === 1 ? '123456' : '123123'
