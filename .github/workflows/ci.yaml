@@ -32,6 +32,10 @@ jobs:
         with:
           version: 9
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
       - name: Install dependencies
         run: pnpm install
 
@@ -65,12 +69,16 @@ jobs:
             with:
                 version: 9
 
+          - uses: actions/setup-node@v6
+            with:
+              node-version: 24
+
           - name: Install dependencies
             run: pnpm install
 
           # anchor to the smallest npm version supporting trusted publishing
           - name: Update npm
-            run: npm install -g npm@^11
+            run: sudo npm install -g npm@^11
 
           - name: Build
             run: pnpm build
