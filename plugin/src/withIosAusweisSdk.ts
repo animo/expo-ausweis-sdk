@@ -95,7 +95,7 @@ const withIosAusweisEntitlements: ConfigPlugin = (config) => {
   return configWithEntitlements
 }
 
-const withIosAusweisSdk: ConfigPlugin<AusweisSdkPluginOptions |undefined> = (config, options) => {
+const withIosAusweisSdk: ConfigPlugin<AusweisSdkPluginOptions | undefined> = (config, options) => {
   const enableEntitlements = options?.ios?.enableEntitlements ?? true
   return withPlugins(
     config,
