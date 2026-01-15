@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { type ConfigPlugin, withAndroidManifest, withDangerousMod, withMainApplication } from '@expo/config-plugins'
+import type { AusweisSdkPluginOptions } from '.'
 import { addAndroidImports } from './util'
 
 /**
@@ -127,7 +128,7 @@ const withAusweisSdkMainApplication: ConfigPlugin = (config) => {
   })
 }
 
-export const withAndroidAusweisSdk: ConfigPlugin = (config) => {
+export const withAndroidAusweisSdk: ConfigPlugin<AusweisSdkPluginOptions | undefined> = (config) => {
   let newConfig = withAusweisSdkAndroidManifest(config)
   newConfig = withAusweisNfcTechnologyFilter(config)
   newConfig = withAusweisSdkMainApplication(config)
