@@ -16,7 +16,7 @@ export interface AusweisSdkPluginOptions {
   }
 }
 
-const withAusweisSdk: ConfigPlugin<AusweisSdkPluginOptions> = (config, options) => {
+const withAusweisSdk: ConfigPlugin<AusweisSdkPluginOptions | undefined> = (config, options) => {
   return withPlugins(config, [
     (config) => withAndroidAusweisSdk(config, options),
     (config) => withIosAusweisSdk(config, options),

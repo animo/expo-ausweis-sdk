@@ -128,7 +128,7 @@ const withAusweisSdkMainApplication: ConfigPlugin = (config) => {
   })
 }
 
-export const withAndroidAusweisSdk: ConfigPlugin<AusweisSdkPluginOptions> = (config) => {
+export const withAndroidAusweisSdk: ConfigPlugin<AusweisSdkPluginOptions | undefined> = (config) => {
   let newConfig = withAusweisSdkAndroidManifest(config)
   newConfig = withAusweisNfcTechnologyFilter(config)
   newConfig = withAusweisSdkMainApplication(config)
