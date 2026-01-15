@@ -2,6 +2,9 @@
   "github": {
     "release": true
   },
+  "hooks": {
+    "before:npm:release": "pnpm pack"
+  },
   "npm": {
     "skipChecks": true,
     "ignoreVersion": true,

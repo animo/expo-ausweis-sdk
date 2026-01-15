@@ -4,6 +4,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { withDangerousMod, withEntitlementsPlist, withInfoPlist, withPlugins } from '@expo/config-plugins'
 import { type MergeResults, mergeContents } from '@expo/config-plugins/build/utils/generateCode'
+import type { AusweisSdkPluginOptions } from '.'
 
 // const podSource = `pod 'AusweisApp2', :path => File.join(File.dirname(\`node --print "require.resolve('@animo-id/expo-ausweis-sdk/package.json')"\`), "ios/Specs")`
 // We need to include the default pod source. By default it is registered implicitly,
@@ -94,8 +95,12 @@ const withIosAusweisEntitlements: ConfigPlugin = (config) => {
   return configWithEntitlements
 }
 
-const withIosAusweisSdk: ConfigPlugin = (config) => {
-  return withPlugins(config, [withIosAusweisEntitlements, withIosAusweisApp2Pod])
+const withIosAusweisSdk: ConfigPlugin<AusweisSdkPluginOptions> = (config, options) => {
+  const enableEntitlements = options.ios?.enableEntitlements ?? true
+  return withPlugins(
+    config,
+    enableEntitlements ? [withIosAusweisEntitlements, withIosAusweisApp2Pod] : [withIosAusweisApp2Pod]
+  )
 }
 
 export { withIosAusweisSdk }
